@@ -19,6 +19,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
+#include "../../Drivers/SYSTEM/delay/delay.h"
+#include "../../Drivers/SYSTEM/led/led.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -79,30 +81,27 @@ int main(void)
 
   /* Configure the system clock */
   SystemClock_Config();
-
+  //sys_stm32_clock_init(RCC_PLL_MUL9);     //和SystemClock_Config()一样
+  delay_init(72);
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init();
+  // MX_GPIO_Init();
+  led_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+  for (int i = 3 - 1; i >= 0; --i) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);  /*LED0 PB5��1*/
-    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);/*LED1 PE5��0*/
-    HAL_Delay(500);
-    HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);/*LED0 PB5��1*/
-    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);  /*LED1 PE5��0*/
-    HAL_Delay(500);
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    delay_ms(500);
   }
   /* USER CODE END 3 */
 }

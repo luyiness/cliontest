@@ -1,0 +1,11 @@
+
+#include "../sys/sys.h"
+
+void led_init(void) {
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+
+    GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_5, GPIO_MODE_OUTPUT_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_LOW};
+                                                                            //输出模式没有上下拉；速度选低速即可
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET); //初始时设灯为灭
+}
