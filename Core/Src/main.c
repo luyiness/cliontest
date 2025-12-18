@@ -21,6 +21,7 @@
 #include "gpio.h"
 #include "../../Drivers/SYSTEM/delay/delay.h"
 #include "../../Drivers/SYSTEM/led/led.h"
+#include "../../Drivers/SYSTEM/key/key.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -90,6 +91,7 @@ int main(void)
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
   led_init();
+  key_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -100,7 +102,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    if (key_scan()) {
+      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    }
     delay_ms(500);
   }
   /* USER CODE END 3 */
