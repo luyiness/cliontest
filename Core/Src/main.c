@@ -91,7 +91,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
-  // led_init();
+  led_init();
   // key_init();
   exti_init();
   /* USER CODE BEGIN 2 */
@@ -100,7 +100,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  for (int i = 3 - 1; i >= 0; --i) {
+  while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
