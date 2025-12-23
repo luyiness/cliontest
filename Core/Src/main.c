@@ -23,6 +23,7 @@
 #include "../../Drivers/SYSTEM/led/led.h"
 #include "../../Drivers/SYSTEM/key/key.h"
 #include "../../Drivers/SYSTEM/exti/exti.h"
+#include "../../Drivers/SYSTEM/usart/usart2.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -65,9 +66,7 @@ void SystemClock_Config(void);
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
-
+int main(void) {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -91,9 +90,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
-  led_init();
-  key_init();
+  // led_init();
+  // key_init();
   // exti_init();
+  usart_init(115200);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -101,18 +101,17 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-    /* USER CODE END WHILE */
+  /* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-    for (int i = 3 - 1; i >= 0; --i) {
-      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-      delay_ms(500);
+  /* USER CODE BEGIN 3 */
+  while (1){
+    if (g_rx_flag == 1) {   //接收到数据后，
+      HAL_UART_Transmit(&g_huart, (uint8_t*)g_rx_buffer, 1, 1000);
+      while (__HAL_UART_GET_FLAG(&g_huart, UART_FLAG_TC) == 0){}  //等待，直到SR的TC位=1、表示传输完成
+      g_rx_flag = 0;
+    } else {
+      delay_ms(100);
     }
-  while (1) {
-    if (key_scan()) {
-      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-    }
-    delay_ms(500);
   }
   /* USER CODE END 3 */
 }
