@@ -29,6 +29,7 @@
 #include "../../Drivers/SYSTEM/usart/usart2.h"
 #include "../../Drivers/SYSTEM/usart/retarget.h"
 #include "../../Drivers/SYSTEM/wdg/wdg.h"
+#include "../../Drivers/SYSTEM/wdg/wwdg.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -99,8 +100,17 @@ int main(void) {
   // key_init();
   // exti_init();
   usart_init(115200);
-  RetargetInit(&g_huart);
-  wdg_init(IWDG_PRESCALER_32, 0x0FFF);    //选32分频，装载值4096；超时时间约3.276s
+  RetargetInit(&g_huart); //初始化printf
+  // wdg_init(IWDG_PRESCALER_32, 0x0FFF);    //选32分频，装载值4096；超时时间约3.276s
+
+  delay_ms(500);
+  if (__HAL_RCC_GET_FLAG(RCC_FLAG_WWDGRST) != RESET) {  //通过RCC_CSR寄存器位WWDGRSTF 判断是否是wwdg复位
+    printf("WWDG reset\r\n");
+    __HAL_RCC_CLEAR_RESET_FLAGS();  //RCC_CSR寄存器reset 0；（我的理解：防止下次判断时干扰，先清0）
+  } else {
+    printf("other reset\r\n");
+  }
+  wwdg_init(0x7F, 0x5f);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -111,12 +121,13 @@ int main(void) {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-  printf("IWDG init\r\n");
+  printf("WWDG init\r\n");
   while (1){
-    uint16_t time = 3000 + rand() % 401;
-    delay_ms(time);
-    wdg_reload();
-    printf("iwdg reload\r\n");
+    // delay_ms(28);//窗口期前喂狗，wwdg复位
+    // delay_ms(40); //窗口期内喂狗，正常reload
+    delay_ms(60); //超时>Tout，会
+    HAL_WWDG_Refresh(&g_wwdg_handle);
+    printf("WWDG reload\r\n");
   }
   /* USER CODE END 3 */
 }
