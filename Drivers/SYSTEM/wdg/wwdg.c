@@ -30,5 +30,6 @@ void WWDG_IRQHandler() {
 }
 void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef *hwwdg) {
     //注意此回调函数是 在WWDG计数器从0x40到0x3F之内运行，时间微秒级别，所以这里最好先喂狗、否则还没执行完就是复位了
-    printf("reload wwdg early wakeup\r\n");
+    HAL_WWDG_Refresh(&g_wwdg_handle);
+    printf("0\r\n");
 }

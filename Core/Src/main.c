@@ -125,9 +125,9 @@ int main(void) {
   while (1){
     // delay_ms(28);//窗口期前喂狗，wwdg复位
     // delay_ms(40); //窗口期内喂狗，正常reload
-    delay_ms(60); //超时>Tout，会
+    delay_ms(90); //超时>Tout，会
     HAL_WWDG_Refresh(&g_wwdg_handle);
-    printf("WWDG reload\r\n");
+    printf("1\r\n");
   }
   /* USER CODE END 3 */
 }
