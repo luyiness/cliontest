@@ -18,12 +18,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+
+#include <stdlib.h>
+
 #include "gpio.h"
 #include "../../Drivers/SYSTEM/delay/delay.h"
 #include "../../Drivers/SYSTEM/led/led.h"
 #include "../../Drivers/SYSTEM/key/key.h"
 #include "../../Drivers/SYSTEM/exti/exti.h"
 #include "../../Drivers/SYSTEM/usart/usart2.h"
+#include "../../Drivers/SYSTEM/usart/retarget.h"
+#include "../../Drivers/SYSTEM/wdg/wdg.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -94,6 +99,8 @@ int main(void) {
   // key_init();
   // exti_init();
   usart_init(115200);
+  RetargetInit(&g_huart);
+  wdg_init(IWDG_PRESCALER_32, 0x0FFF);    //选32分频，装载值4096；超时时间约3.276s
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -104,14 +111,12 @@ int main(void) {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+  printf("IWDG init\r\n");
   while (1){
-    if (g_rx_flag == 1) {   //接收到数据后，
-      HAL_UART_Transmit(&g_huart, (uint8_t*)g_rx_buffer, 1, 1000);
-      while (__HAL_UART_GET_FLAG(&g_huart, UART_FLAG_TC) == 0){}  //等待，直到SR的TC位=1、表示传输完成
-      g_rx_flag = 0;
-    } else {
-      delay_ms(100);
-    }
+    uint16_t time = 3000 + rand() % 401;
+    delay_ms(time);
+    wdg_reload();
+    printf("iwdg reload\r\n");
   }
   /* USER CODE END 3 */
 }
