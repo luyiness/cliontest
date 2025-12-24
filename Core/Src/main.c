@@ -32,6 +32,7 @@
 #include "../../Drivers/SYSTEM/wdg/wwdg.h"
 #include "../../Drivers/SYSTEM/tim/btim.h"
 #include "../../Drivers/SYSTEM/tim/gtim_pwm.h"
+#include "../../Drivers/SYSTEM/tim/gtim_ic.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -101,12 +102,13 @@ int main(void) {
   // led_init();
   // key_init();
   // exti_init();
-  // usart_init(115200);
-  // RetargetInit(&g_huart); //初始化printf
+  usart_init(115200);
+  RetargetInit(&g_huart); //初始化printf
   // wdg_init(IWDG_PRESCALER_32, 0x0FFF);    //选32分频，装载值4096；超时时间约3.276s
   // wwdg_init(0x7F, 0x5f);
   // btim_init(12000,12000);
-  gtim_pwm_init(71,499);
+  // gtim_pwm_init(71,499);
+  gtim_ic_init(71, 65535);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -117,19 +119,15 @@ int main(void) {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-  uint16_t ledrpwmval = 0;
-  uint8_t dir = 1;
+  printf("begin\r\n");
   while (1){
-    delay_ms(10);
-
-    if (dir)ledrpwmval++;               /* dir==1 ledrpwmval递增 */
-    else ledrpwmval--;                  /* dir==0 ledrpwmval递减 */
-
-    if (ledrpwmval > 300)dir = 0;       /* ledrpwmval到达300后，方向为递减 */
-    if (ledrpwmval == 0)dir = 1;        /* ledrpwmval递减到0后，方向改为递增 */
-
-    /* 修改比较值控制占空比 */
-    __HAL_TIM_SET_COMPARE(&g_timx_pwm_chy_handle, TIM_CHANNEL_2, ledrpwmval);
+    if (g_timxchy_cap_sta & 0X80) {
+      // = (CCRx2)/ARR*f + N*1/f,  f = 1/65536 MHz
+      uint32_t duration = g_timxchy_cap_val + (g_timxchy_cap_sta & 0X3F)*65536;
+      printf("time elapsed: %.3fs\r\n", duration/1000.0/1000.0);  //保留三位小数；注意1000.0
+      g_timxchy_cap_sta = 0;  //开启下次测量
+    }
+    delay_ms(1000);
   }
   /* USER CODE END 3 */
 }

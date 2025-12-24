@@ -25,8 +25,8 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim) {
 void TIM6_IRQHandler(void) {
     HAL_TIM_IRQHandler(&g_timHandle);
 }
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM6) {
-        HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-    }
-}
+// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+//     if (htim->Instance == TIM6) {
+//         HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+//     }
+// }
