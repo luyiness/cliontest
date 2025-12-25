@@ -34,6 +34,7 @@
 #include "../../Drivers/SYSTEM/tim/gtim_pwm.h"
 #include "../../Drivers/SYSTEM/tim/gtim_ic.h"
 #include "../../Drivers/SYSTEM/tim/gtim_ecm1.h"
+#include "../../Drivers/SYSTEM/tim/atim_rc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -100,17 +101,18 @@ int main(void) {
 
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
-  // led_init();
-  // key_init();
+  led_init();
+  key_init();
   // exti_init();
-  usart_init(115200);
-  RetargetInit(&g_huart); //初始化printf
+  // usart_init(115200);
+  // RetargetInit(&g_huart); //初始化printf
   // wdg_init(IWDG_PRESCALER_32, 0x0FFF);    //选32分频，装载值4096；超时时间约3.276s
   // wwdg_init(0x7F, 0x5f);
   // btim_init(12000,12000);
   // gtim_pwm_init(71,499);
   // gtim_ic_init(71, 65535);
-  gtim_ecm1_init(0,65535);
+  // gtim_ecm1_init(0,65535);
+    atim_rc_init(7199,4999);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -121,10 +123,13 @@ int main(void) {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-  printf("--begin--\r\n");
+  // printf("--begin--\r\n");
   while (1){
-    printf("PWM count: %d\r\n", getCounterValue());
-    delay_ms(2000);   //每2s打印一次PWM波数、也就是按键按下数
+    if (key_scan()) {
+      //key0,PE4
+      atim_timx_npwm_chy_set(3);
+    }
+    delay_ms(100);
   }
   /* USER CODE END 3 */
 }

@@ -72,21 +72,21 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {      //注意只要�
 }
 
 //update event callback
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {       //只要CNT溢出，就进入此函数
-    if (htim->Instance == TIM5) {
-        if (!(g_timxchy_cap_sta & 0X80)) {
-            if (g_timxchy_cap_sta & 0X40) {     //若已经捕获到上升沿后（t1后），开始N++、记录溢出次数
-                if ((g_timxchy_cap_sta & 0X3F) == 0X3F){    //溢出次数N已达到最大63；（[6:0]位=1111111）
-                    //g_timxchy_cap_val直接=最大值，
-                    g_timxchy_cap_val = 0XFFFF;
-                    //为下次测量做准备，标记此次测量完毕
-                    TIM_RESET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //清除原来的上/下沿触发配置；capture polarity
-                    TIM_SET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);  //设上升沿触发；capture polarity
-                    g_timxchy_cap_sta |= 0x80;
-                }else {
-                    g_timxchy_cap_sta++;
-                }
-            }
-        }
-    }
-}
+// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {       //只要CNT溢出，就进入此函数
+//     if (htim->Instance == TIM5) {
+//         if (!(g_timxchy_cap_sta & 0X80)) {
+//             if (g_timxchy_cap_sta & 0X40) {     //若已经捕获到上升沿后（t1后），开始N++、记录溢出次数
+//                 if ((g_timxchy_cap_sta & 0X3F) == 0X3F){    //溢出次数N已达到最大63；（[6:0]位=1111111）
+//                     //g_timxchy_cap_val直接=最大值，
+//                     g_timxchy_cap_val = 0XFFFF;
+//                     //为下次测量做准备，标记此次测量完毕
+//                     TIM_RESET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //清除原来的上/下沿触发配置；capture polarity
+//                     TIM_SET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);  //设上升沿触发；capture polarity
+//                     g_timxchy_cap_sta |= 0x80;
+//                 }else {
+//                     g_timxchy_cap_sta++;
+//                 }
+//             }
+//         }
+//     }
+// }
