@@ -33,6 +33,7 @@
 #include "../../Drivers/SYSTEM/tim/btim.h"
 #include "../../Drivers/SYSTEM/tim/gtim_pwm.h"
 #include "../../Drivers/SYSTEM/tim/gtim_ic.h"
+#include "../../Drivers/SYSTEM/tim/gtim_ecm1.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -108,7 +109,8 @@ int main(void) {
   // wwdg_init(0x7F, 0x5f);
   // btim_init(12000,12000);
   // gtim_pwm_init(71,499);
-  gtim_ic_init(71, 65535);
+  // gtim_ic_init(71, 65535);
+  gtim_ecm1_init(0,65535);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -119,15 +121,10 @@ int main(void) {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-  printf("begin\r\n");
+  printf("--begin--\r\n");
   while (1){
-    if (g_timxchy_cap_sta & 0X80) {
-      // = (CCRx2)/ARR*f + N*1/f,  f = 1/65536 MHz
-      uint32_t duration = g_timxchy_cap_val + (g_timxchy_cap_sta & 0X3F)*65536;
-      printf("time elapsed: %.3fs\r\n", duration/1000.0/1000.0);  //保留三位小数；注意1000.0
-      g_timxchy_cap_sta = 0;  //开启下次测量
-    }
-    delay_ms(1000);
+    printf("PWM count: %d\r\n", getCounterValue());
+    delay_ms(2000);   //每2s打印一次PWM波数、也就是按键按下数
   }
   /* USER CODE END 3 */
 }

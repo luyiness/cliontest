@@ -23,22 +23,22 @@ void gtim_ic_init(uint32_t prescaler, uint32_t rlr) {
     __HAL_TIM_ENABLE_IT(&g_timx_ic_chy_handle, TIM_IT_UPDATE);     //enable update interrupt
     HAL_TIM_IC_Start_IT(&g_timx_ic_chy_handle, TIM_CHANNEL_1);
 }
-void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM5) {
-        //初始化PA0
-        //1、IO口输出初始化
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_0, GPIO_MODE_INPUT, GPIO_PULLDOWN, GPIO_SPEED_FREQ_HIGH};
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-        //初始化TIM5时钟
-        __HAL_RCC_TIM5_CLK_ENABLE();
-
-        //NVIC
-        HAL_NVIC_SetPriority(TIM5_IRQn, 15, 0);
-        HAL_NVIC_EnableIRQ(TIM5_IRQn);
-    }
-}
+// void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
+//     if (htim->Instance == TIM5) {
+//         //初始化PA0
+//         //1、IO口输出初始化
+//         __HAL_RCC_GPIOA_CLK_ENABLE();
+//         GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_0, GPIO_MODE_INPUT, GPIO_PULLDOWN, GPIO_SPEED_FREQ_HIGH};
+//         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+//
+//         //初始化TIM5时钟
+//         __HAL_RCC_TIM5_CLK_ENABLE();
+//
+//         //NVIC
+//         HAL_NVIC_SetPriority(TIM5_IRQn, 15, 0);
+//         HAL_NVIC_EnableIRQ(TIM5_IRQn);
+//     }
+// }
 
 void TIM5_IRQHandler(void) {
     HAL_TIM_IRQHandler(&g_timx_ic_chy_handle);
