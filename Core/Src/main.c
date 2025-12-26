@@ -35,6 +35,7 @@
 #include "../../Drivers/SYSTEM/tim/gtim_ic.h"
 #include "../../Drivers/SYSTEM/tim/gtim_ecm1.h"
 #include "../../Drivers/SYSTEM/tim/atim_rc.h"
+#include "../../Drivers/SYSTEM/tim/atim_pwm.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -102,7 +103,7 @@ int main(void) {
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
   led_init();
-  key_init();
+  // key_init();
   // exti_init();
   // usart_init(115200);
   // RetargetInit(&g_huart); //初始化printf
@@ -112,7 +113,9 @@ int main(void) {
   // gtim_pwm_init(71,499);
   // gtim_ic_init(71, 65535);
   // gtim_ecm1_init(0,65535);
-    atim_rc_init(7199,4999);
+    // atim_rc_init(7199,4999);
+  // atim_pwm_chy_init(71,999);
+  atim_pwm_chy_init(1000,65535);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -124,11 +127,9 @@ int main(void) {
 
   /* USER CODE BEGIN 3 */
   // printf("--begin--\r\n");
+  // atim_timx_cplm_pwm_set(700,100);
+  atim_timx_cplm_pwm_set(45874,0);
   while (1){
-    if (key_scan()) {
-      //key0,PE4
-      atim_timx_npwm_chy_set(3);
-    }
     delay_ms(100);
   }
   /* USER CODE END 3 */

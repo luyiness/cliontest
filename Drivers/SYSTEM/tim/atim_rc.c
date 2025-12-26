@@ -24,20 +24,20 @@ void atim_rc_init(uint32_t prescaler,uint32_t rlr) {
 
     __HAL_TIM_ENABLE_IT(&g_timx_rc_chy_handle, TIM_IT_UPDATE);
 }
-void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM8) {
-        //初始化PC6
-        __HAL_RCC_GPIOC_CLK_ENABLE();
-        GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_6, GPIO_MODE_AF_PP, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH};
-        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-
-        __HAL_RCC_TIM8_CLK_ENABLE();
-
-        HAL_NVIC_SetPriority(TIM8_UP_IRQn,15,0);    //TIM8 update interrupt
-        HAL_NVIC_EnableIRQ(TIM8_UP_IRQn);
-    }
-}
+// void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
+//     if (htim->Instance == TIM8) {
+//         //初始化PC6
+//         __HAL_RCC_GPIOC_CLK_ENABLE();
+//         GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_6, GPIO_MODE_AF_PP, GPIO_PULLUP, GPIO_SPEED_FREQ_HIGH};
+//         HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+//         HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+//
+//         __HAL_RCC_TIM8_CLK_ENABLE();
+//
+//         HAL_NVIC_SetPriority(TIM8_UP_IRQn,15,0);    //TIM8 update interrupt
+//         HAL_NVIC_EnableIRQ(TIM8_UP_IRQn);
+//     }
+// }
 
 void TIM8_UP_IRQHandler(void)
 {
