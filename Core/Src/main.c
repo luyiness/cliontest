@@ -36,6 +36,7 @@
 #include "../../Drivers/SYSTEM/tim/gtim_ecm1.h"
 #include "../../Drivers/SYSTEM/tim/atim_rc.h"
 #include "../../Drivers/SYSTEM/tim/atim_pwm.h"
+#include "../../Drivers/SYSTEM/tim/atim_pwm_survey.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -71,7 +72,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint16_t g_timxchy_pwmin_sta=0;    /* PWM输入状态 */
+uint32_t g_timxchy_pwmin_hval=0;   /* PWM的高电平脉宽 */
+uint32_t g_timxchy_pwmin_cval=0;   /* PWM的周期宽度 */
 /* USER CODE END 0 */
 
 /**
@@ -105,17 +108,19 @@ int main(void) {
   led_init();
   // key_init();
   // exti_init();
-  // usart_init(115200);
-  // RetargetInit(&g_huart); //初始化printf
+  usart_init(115200);
+  RetargetInit(&g_huart); //初始化printf
   // wdg_init(IWDG_PRESCALER_32, 0x0FFF);    //选32分频，装载值4096；超时时间约3.276s
   // wwdg_init(0x7F, 0x5f);
   // btim_init(12000,12000);
-  // gtim_pwm_init(71,499);
+  gtim_pwm_init(71,9);  //产生PWM到TIM3_CH2，PB5
+
   // gtim_ic_init(71, 65535);
   // gtim_ecm1_init(0,65535);
     // atim_rc_init(7199,4999);
   // atim_pwm_chy_init(71,999);
-  atim_pwm_chy_init(1000,65535);
+  // atim_pwm_chy_init(1000,65535);
+  atim_pwm_survey_init();   //TIM8_CH1（PC6）
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -126,11 +131,22 @@ int main(void) {
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-  // printf("--begin--\r\n");
+
   // atim_timx_cplm_pwm_set(700,100);
-  atim_timx_cplm_pwm_set(45874,0);
+  // atim_timx_cplm_pwm_set(45874,0);
+  double tpsc = 1.0 / 72;
   while (1){
-    delay_ms(100);
+    if (g_timxchy_pwmin_sta) {
+      printf("--begin--\r\n");
+      printf("PWM Hight:%d\r\n", g_timxchy_pwmin_hval);   /* CCR2 */
+      printf("PWM Cycle:%d\r\n", g_timxchy_pwmin_cval);   /* CCR1 */
+      printf("PWM Hight time:%.3fus\r\n", g_timxchy_pwmin_hval * tpsc);            /* 打印高电平脉宽长度 */
+      printf("PWM Cycle time:%.3fus\r\n", g_timxchy_pwmin_cval * tpsc);            /* 打印周期时间长度 */
+      printf("--end--\r\n");
+      atim_timx_pwmin_chy_restart(); /* 重启PWM输入检测 */
+    }
+      //TIM3->CCR2=5; //设置重装载值，以调整占空比
+    delay_ms(2000);
   }
   /* USER CODE END 3 */
 }

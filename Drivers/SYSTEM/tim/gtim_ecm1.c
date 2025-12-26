@@ -21,16 +21,16 @@ void gtim_ecm1_init(uint32_t prescaler,uint32_t rlr) {
 
     HAL_TIM_IC_Start(&g_timx_ecm_chy_handle, TIM_CHANNEL_1);     //使能ic部分，开启counter
 }
-void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM2) {
-        //初始化PA0
-        __HAL_RCC_GPIOA_CLK_ENABLE();
-        GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_0, GPIO_MODE_INPUT, GPIO_PULLDOWN, GPIO_SPEED_FREQ_HIGH};
-        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-        __HAL_RCC_TIM2_CLK_ENABLE();
-    }
-}
+// void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim) {
+//     if (htim->Instance == TIM2) {
+//         //初始化PA0
+//         __HAL_RCC_GPIOA_CLK_ENABLE();
+//         GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_0, GPIO_MODE_INPUT, GPIO_PULLDOWN, GPIO_SPEED_FREQ_HIGH};
+//         HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+//
+//         __HAL_RCC_TIM2_CLK_ENABLE();
+//     }
+// }
 
 uint16_t getCounterValue() {
     uint16_t count = __HAL_TIM_GET_COUNTER(&g_timx_ecm_chy_handle);

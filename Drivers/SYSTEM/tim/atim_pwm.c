@@ -36,24 +36,24 @@ void atim_pwm_chy_init(uint32_t prescaler,uint32_t rlr) {
     HAL_TIM_PWM_Start(&g_atimx_pwm_chy_handle,TIM_CHANNEL_1);       //OCx使能
     HAL_TIMEx_PWMN_Start(&g_atimx_pwm_chy_handle,TIM_CHANNEL_1);    //OCxN使能
 }
-void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
-    if (htim->Instance == TIM1) {
-        //1、IO口输出初始化
-        __HAL_RCC_GPIOE_CLK_ENABLE();
-        GPIO_InitTypeDef pe8 = {GPIO_PIN_8, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
-        GPIO_InitTypeDef pe9 = {GPIO_PIN_9, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
-        GPIO_InitTypeDef pe15 = {GPIO_PIN_15, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
-        HAL_GPIO_Init(GPIOE, &pe8);
-        HAL_GPIO_Init(GPIOE, &pe9);
-        HAL_GPIO_Init(GPIOE, &pe15);
-        //2、开启重映射
-        __HAL_RCC_AFIO_CLK_ENABLE();    //开启AFIO时钟
-        __HAL_AFIO_REMAP_TIM1_ENABLE();
-
-        //初始化TIM1时钟
-        __HAL_RCC_TIM1_CLK_ENABLE();
-    }
-}
+// void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
+//     if (htim->Instance == TIM1) {
+//         //1、IO口输出初始化
+//         __HAL_RCC_GPIOE_CLK_ENABLE();
+//         GPIO_InitTypeDef pe8 = {GPIO_PIN_8, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
+//         GPIO_InitTypeDef pe9 = {GPIO_PIN_9, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
+//         GPIO_InitTypeDef pe15 = {GPIO_PIN_15, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
+//         HAL_GPIO_Init(GPIOE, &pe8);
+//         HAL_GPIO_Init(GPIOE, &pe9);
+//         HAL_GPIO_Init(GPIOE, &pe15);
+//         //2、开启重映射
+//         __HAL_RCC_AFIO_CLK_ENABLE();    //开启AFIO时钟
+//         __HAL_AFIO_REMAP_TIM1_ENABLE();
+//
+//         //初始化TIM1时钟
+//         __HAL_RCC_TIM1_CLK_ENABLE();
+//     }
+// }
 
 //设置比较值，设置dead-time
 void atim_timx_cplm_pwm_set(uint16_t ccr, uint8_t dtg) {

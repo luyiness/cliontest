@@ -48,28 +48,28 @@ uint8_t g_timxchy_cap_sta = 0;
 uint16_t g_timxchy_cap_val = 0;
 
 //Input capture callback
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {      //注意只要进入了这个函数，就是捕获到了上升/下降沿、这是中断判断的，用户代码只写：第一次进入是上升沿、写其相关逻辑，第二次进入是下降沿、写其相关逻辑
-    if (htim->Instance == TIM5) {
-        if (!(g_timxchy_cap_sta & 0X80)) {  //[7]位==0时
-            if (g_timxchy_cap_sta & 0X40) {  //[6]位==1时
-                //捕获到下降沿
-                g_timxchy_cap_val = HAL_TIM_ReadCapturedValue(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //获取CCRx
-                //为下次测量做准备，标记此次测量完毕
-                TIM_RESET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //清除原来的上/下沿触发配置；capture polarity
-                TIM_SET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);  //设上升沿触发；capture polarity
-                g_timxchy_cap_sta |= 0x80;
-            } else {
-                //捕获到上升沿
-                g_timxchy_cap_sta = 0;      //首先变量清零，清空上次测试的数据
-                g_timxchy_cap_val = 0;      //首先变量清零，清空上次测试的数据
-                __HAL_TIM_SET_COUNTER(&g_timx_ic_chy_handle,0); //计数器清零
-                TIM_RESET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //清除原来的上/下沿触发配置；capture polarity
-                TIM_SET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1, TIM_ICPOLARITY_FALLING);  //设下降沿触发；capture polarity
-                g_timxchy_cap_sta |= 0X40;  //[6]位置1
-            }
-        }
-    }
-}
+// void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {      //注意只要进入了这个函数，就是捕获到了上升/下降沿、这是中断判断的，用户代码只写：第一次进入是上升沿、写其相关逻辑，第二次进入是下降沿、写其相关逻辑
+//     if (htim->Instance == TIM5) {
+//         if (!(g_timxchy_cap_sta & 0X80)) {  //[7]位==0时
+//             if (g_timxchy_cap_sta & 0X40) {  //[6]位==1时
+//                 //捕获到下降沿
+//                 g_timxchy_cap_val = HAL_TIM_ReadCapturedValue(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //获取CCRx
+//                 //为下次测量做准备，标记此次测量完毕
+//                 TIM_RESET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //清除原来的上/下沿触发配置；capture polarity
+//                 TIM_SET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1, TIM_ICPOLARITY_RISING);  //设上升沿触发；capture polarity
+//                 g_timxchy_cap_sta |= 0x80;
+//             } else {
+//                 //捕获到上升沿
+//                 g_timxchy_cap_sta = 0;      //首先变量清零，清空上次测试的数据
+//                 g_timxchy_cap_val = 0;      //首先变量清零，清空上次测试的数据
+//                 __HAL_TIM_SET_COUNTER(&g_timx_ic_chy_handle,0); //计数器清零
+//                 TIM_RESET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1);    //清除原来的上/下沿触发配置；capture polarity
+//                 TIM_SET_CAPTUREPOLARITY(&g_timx_ic_chy_handle, TIM_CHANNEL_1, TIM_ICPOLARITY_FALLING);  //设下降沿触发；capture polarity
+//                 g_timxchy_cap_sta |= 0X40;  //[6]位置1
+//             }
+//         }
+//     }
+// }
 
 //update event callback
 // void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {       //只要CNT溢出，就进入此函数

@@ -21,18 +21,18 @@ void gtim_pwm_init(uint32_t prescaler,uint32_t rlr) {
 
     HAL_TIM_PWM_Start(&g_timx_pwm_chy_handle,TIM_CHANNEL_2);
 }
-// void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
-//     if (htim->Instance == TIM3) {
-//         //初始化PB5
-//         //1、IO口输出初始化
-//         __HAL_RCC_GPIOB_CLK_ENABLE();
-//         GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_5, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
-//         HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-//         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-//         //2、开启重映射
-//         __HAL_AFIO_REMAP_TIM3_PARTIAL();
-//
-//         //初始化TIM3时钟
-//         __HAL_RCC_TIM3_CLK_ENABLE();
-//     }
-// }
+void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM3) {
+        //初始化PB5
+        //1、IO口输出初始化
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+        GPIO_InitTypeDef GPIO_InitStruct = {GPIO_PIN_5, GPIO_MODE_AF_PP, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+        //2、开启重映射
+        __HAL_AFIO_REMAP_TIM3_PARTIAL();
+
+        //初始化TIM3时钟
+        __HAL_RCC_TIM3_CLK_ENABLE();
+    }
+}
