@@ -22,6 +22,9 @@
 #include "../../Drivers/SYSTEM/delay/delay.h"
 #include "../../Drivers/SYSTEM/led/led.h"
 #include "../../Drivers/SYSTEM/key/key.h"
+#include "../../Drivers/SYSTEM/usart/usart2.h"
+#include "../../Drivers/SYSTEM/usart/retarget.h"
+#include "../../Drivers/SYSTEM/tpad/tpad.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -91,19 +94,28 @@ int main(void)
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
   led_init();
-  key_init();
+  usart_init(115200);
+  RetargetInit(&g_huart); //初始化printf
+  // key_init();
+  tpad_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint16_t t=0;
+  printf("--begin--\r\n");
   while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    if (key_scan()) {
+    t = tpad_get_val();
+    if (t) {
       HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+      printf("charge duration(CCRx): %d\r\n",t);
+    } else {
+      printf("spill \r\n");
     }
     delay_ms(500);
   }
