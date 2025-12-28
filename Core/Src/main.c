@@ -25,6 +25,8 @@
 #include "../../Drivers/SYSTEM/usart/usart2.h"
 #include "../../Drivers/SYSTEM/usart/retarget.h"
 #include "../../Drivers/SYSTEM/tpad/tpad.h"
+#include "../../Drivers/SYSTEM/fsmc/fsmc_lcd.h"
+#include "../../Drivers/SYSTEM/fsmc/pack/util.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -97,27 +99,58 @@ int main(void)
   usart_init(115200);
   RetargetInit(&g_huart); //初始化printf
   // key_init();
-  tpad_init();
+  // tpad_init();
+  fsmc_lcd_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint16_t t=0;
-  printf("--begin--\r\n");
+  lcd_draw_point(0,0,RED);
+  lcd_draw_point(0,1,RED);
+  lcd_draw_point(100,100,CYAN);
+
+  printf("color is : %#x\r\n",lcd_read_point(100,100));
+  uint8_t i = 0;
   while (1) {
     /* USER CODE END WHILE */
+    switch (i) {
+      case 0:
+        lcd_clear(WHITE);
+        break;
 
-    /* USER CODE BEGIN 3 */
-    t = tpad_get_val();
-    if (t) {
-      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-      printf("charge duration(CCRx): %d\r\n",t);
-    } else {
-      printf("spill \r\n");
+      case 1:
+        lcd_clear(BLACK);
+        break;
+
+      case 2:
+        lcd_clear(BLUE);
+        break;
+
+      case 3:
+        lcd_clear(RED);
+        break;
+
+      case 4:
+        lcd_clear(MAGENTA);
+        break;
+
+      case 5:
+        lcd_clear(GREEN);
+        break;
     }
+
+    // lcd_show_string(10, 40, 240, 32, 32, "STM32", RED);
+    // lcd_show_string(10, 80, 240, 24, 24, "TFTLCD TEST", RED);
+    // lcd_show_string(10, 110, 240, 16, 16, "ATOM@ALIENTEK", RED);
+    // lcd_show_string(10, 130, 240, 16, 16, (char *)lcd_id, RED); /* 显示LCD ID */
+    i++;
+    if (i == 6) i = 0;
+
     delay_ms(500);
+    /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
