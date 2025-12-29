@@ -107,46 +107,47 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  lcd_draw_point(0,0,RED);
-  lcd_draw_point(0,1,RED);
+  lcd_draw_point(4,0,RED);
+  lcd_draw_point(3,1,RED);
   lcd_draw_point(100,100,CYAN);
 
   printf("color is : %#x\r\n",lcd_read_point(100,100));
-  uint8_t i = 0;
+
+  uint8_t lcd_id[12];
+  sprintf((char *)lcd_id, "LCD ID:%04X", lcddev.id);
+
+  uint8_t i = 10;
   while (1) {
     /* USER CODE END WHILE */
     switch (i) {
       case 0:
         lcd_clear(WHITE);
         break;
-
       case 1:
         lcd_clear(BLACK);
         break;
-
       case 2:
         lcd_clear(BLUE);
         break;
-
       case 3:
         lcd_clear(RED);
         break;
-
       case 4:
         lcd_clear(MAGENTA);
         break;
-
       case 5:
-        lcd_clear(GREEN);
+        lcd_clear(WHITE);
         break;
     }
+    if (i <= 7) i++;
 
-    // lcd_show_string(10, 40, 240, 32, 32, "STM32", RED);
-    // lcd_show_string(10, 80, 240, 24, 24, "TFTLCD TEST", RED);
-    // lcd_show_string(10, 110, 240, 16, 16, "ATOM@ALIENTEK", RED);
-    // lcd_show_string(10, 130, 240, 16, 16, (char *)lcd_id, RED); /* 显示LCD ID */
-    i++;
-    if (i == 6) i = 0;
+    lcd_show_string(10, 40, 240, 32, 32, "STM32", RED);
+    lcd_show_string(10, 80, 240, 24, 24, "TFTLCD TEST", RED);
+    lcd_show_string(10, 110, 240, 16, 16, "ATOM@ALIENTEK", RED);
+    lcd_show_string(10, 130, 240, 16, 16, (char *)lcd_id, RED); /* 显示LCD ID */
+
+    lcd_fill_circle(50,180,20,BLUE);
+    lcd_draw_hline(30,210,50,BLACK);
 
     delay_ms(500);
     /* USER CODE BEGIN 3 */

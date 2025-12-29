@@ -56,7 +56,10 @@ uint16_t lcd_read_point (uint16_t x, uint16_t y);
 void lcd_clear(uint16_t color);
 void lcd_write_reg(uint16_t regno, uint16_t data);
 
-void lcd_ex_st7789_reginit(void);
 void lcd_ex_ili9341_reginit(void);
+
+void lcd_show_string(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t size, char *p, uint16_t color);
+void lcd_fill_circle(uint16_t x, uint16_t y, uint16_t r, uint16_t color);
+void lcd_draw_hline(uint16_t x, uint16_t y, uint16_t len, uint16_t color);
 
 #endif //CLIONTEST_UTIL_H

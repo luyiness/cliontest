@@ -37,7 +37,7 @@
 #define LCD_RS_GPIO_CLK_ENABLE()            do{ __HAL_RCC_GPIOG_CLK_ENABLE(); }while(0)     /* PG口时钟使能 */
 
 
-/* LCD背光控制，PB0的BSRR的BR0=1？？？ */
+/* LCD背光控制，和HAL_GPIO_WritePin一样，只不过是直接操作BSRR寄存器 */
 #define LCD_BL(x)       LCD_BL_GPIO_PORT->BSRR = LCD_BL_GPIO_PIN << (16 * (!x))
 
 #define LCD_FSMC_NEX         4      //CS，FSMC_NE4 块1区4

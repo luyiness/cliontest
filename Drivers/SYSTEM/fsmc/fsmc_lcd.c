@@ -55,8 +55,7 @@ void fsmc_lcd_init() {
     /* 3、完成初始化序列 */
     if (lcddev.id == 0x9341)
         lcd_ex_ili9341_reginit();
-    else
-        lcd_ex_st7789_reginit();
+    //其他屏幕的初始化我删了
 
     /* 4、对LCD控制结构体赋值 */
     lcddev.width = 240;
@@ -88,6 +87,7 @@ void fsmc_lcd_init() {
 
 void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram) {
     __HAL_RCC_FSMC_CLK_ENABLE();    //FSMC时钟初始化
+    __HAL_RCC_GPIOE_CLK_ENABLE();           /* 使能GPIOE时钟 */
 
     //用到的GPIO口初始化
     LCD_WR_GPIO_CLK_ENABLE();
@@ -110,5 +110,18 @@ void HAL_SRAM_MspInit(SRAM_HandleTypeDef *hsram) {
     gpio_init_struct.Pin = LCD_BL_GPIO_PIN;
     gpio_init_struct.Mode = GPIO_MODE_OUTPUT_PP;            /* 推挽输出 */
     HAL_GPIO_Init(LCD_BL_GPIO_PORT, &gpio_init_struct);     /* LCD_BL引脚模式设置(推挽输出) */
-}
 
+    /* 数据线初始化 */
+    /* 初始化PD0,1,8,9,10,14,15 */
+    gpio_init_struct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_8 \
+                           | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_14 | GPIO_PIN_15;
+    gpio_init_struct.Mode = GPIO_MODE_AF_PP;                  /* 推挽复用 */
+    gpio_init_struct.Pull = GPIO_PULLUP;                      /* 上拉 */
+    gpio_init_struct.Speed = GPIO_SPEED_FREQ_HIGH;            /* 高速 */
+    HAL_GPIO_Init(GPIOD, &gpio_init_struct);                  /* 初始化 */
+
+    /* 初始化PE7,8,9,10,11,12,13,14,15 */
+    gpio_init_struct.Pin = GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 \
+                           | GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+    HAL_GPIO_Init(GPIOE, &gpio_init_struct);
+}
