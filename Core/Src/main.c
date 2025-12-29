@@ -27,6 +27,7 @@
 #include "../../Drivers/SYSTEM/tpad/tpad.h"
 #include "../../Drivers/SYSTEM/fsmc/fsmc_lcd.h"
 #include "../../Drivers/SYSTEM/fsmc/pack/util.h"
+#include "../../Drivers/SYSTEM/rtc/rtc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -101,55 +102,26 @@ int main(void)
   // key_init();
   // tpad_init();
   fsmc_lcd_init();
+  rtc_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  lcd_draw_point(4,0,RED);
-  lcd_draw_point(3,1,RED);
-  lcd_draw_point(100,100,CYAN);
-
-  printf("color is : %#x\r\n",lcd_read_point(100,100));
-
-  uint8_t lcd_id[12];
-  sprintf((char *)lcd_id, "LCD ID:%04X", lcddev.id);
-
-  uint8_t i = 10;
+  uint32_t seccount = rtc_set_time(2020, 4, 25, 20, 25, 35);
   while (1) {
     /* USER CODE END WHILE */
-    switch (i) {
-      case 0:
-        lcd_clear(WHITE);
-        break;
-      case 1:
-        lcd_clear(BLACK);
-        break;
-      case 2:
-        lcd_clear(BLUE);
-        break;
-      case 3:
-        lcd_clear(RED);
-        break;
-      case 4:
-        lcd_clear(MAGENTA);
-        break;
-      case 5:
-        lcd_clear(WHITE);
-        break;
-    }
-    if (i <= 7) i++;
+    calendar_obj calendar = rtc_get_time();
+    char buffer[100];
+    sprintf(buffer,"%dY %dM %dD",calendar.year,calendar.month,calendar.date);
+    lcd_show_string(10, 80, 240, 24, 24, buffer, RED);
+    sprintf(buffer,"%d:%d:%d",calendar.hour,calendar.min,calendar.sec);
+    lcd_show_string(10, 110, 240, 24, 24, buffer, RED);
 
-    lcd_show_string(10, 40, 240, 32, 32, "STM32", RED);
-    lcd_show_string(10, 80, 240, 24, 24, "TFTLCD TEST", RED);
-    lcd_show_string(10, 110, 240, 16, 16, "ATOM@ALIENTEK", RED);
-    lcd_show_string(10, 130, 240, 16, 16, (char *)lcd_id, RED); /* 显示LCD ID */
-
-    lcd_fill_circle(50,180,20,BLUE);
-    lcd_draw_hline(30,210,50,BLACK);
-
-    delay_ms(500);
+    sprintf(buffer,"%d",seccount);
+    lcd_show_string(10, 140, 240, 24, 24, buffer, BLUE);
+    delay_ms(501);
     /* USER CODE BEGIN 3 */
 
   }
