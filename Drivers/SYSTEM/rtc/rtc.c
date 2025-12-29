@@ -16,6 +16,11 @@ uint8_t rtc_init(void) {
     g_rtc_handle.Init.AsynchPrediv = 32767;
     g_rtc_handle.Init.OutPut = RTC_OUTPUTSOURCE_NONE;   //tamper pin的输出。没用到
     HAL_RTC_Init(&g_rtc_handle);
+
+    if (rtc_read_bkr(0)!= 0x7777) {     //随便读和写一个数在后备区域SRAM就行，保证在掉电后不会重新set_time；测试：按下复位键时间不会重新set
+        rtc_set_time(2025, 12, 29, 22, 24, 00);
+        rtc_write_bkr(0, 0x7777);
+    }
 }
 
 void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc) {
@@ -61,3 +66,19 @@ calendar_obj rtc_get_time(void) {
     return sec2rtc_date(seccount);
 }
 
+
+
+//RTC写入后备区域SRAM； bkrx : 后备区寄存器编号,范围:0~41 对应 RTC_BKP_DR1~RTC_BKP_DR42
+void rtc_write_bkr(uint32_t bkrx, uint16_t data)
+{
+    HAL_PWR_EnableBkUpAccess(); /* 取消备份区写保护 */
+    HAL_RTCEx_BKUPWrite(&g_rtc_handle, bkrx + 1, data);
+}
+
+//RTC读取后备区域SRAM
+uint16_t rtc_read_bkr(uint32_t bkrx)
+{
+    uint32_t temp = 0;
+    temp = HAL_RTCEx_BKUPRead(&g_rtc_handle, bkrx + 1);
+    return (uint16_t)temp; /* 返回读取到的值 */
+}

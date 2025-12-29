@@ -109,7 +109,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint32_t seccount = rtc_set_time(2020, 4, 25, 20, 25, 35);
   while (1) {
     /* USER CODE END WHILE */
     calendar_obj calendar = rtc_get_time();
@@ -119,8 +118,8 @@ int main(void)
     sprintf(buffer,"%d:%d:%d",calendar.hour,calendar.min,calendar.sec);
     lcd_show_string(10, 110, 240, 24, 24, buffer, RED);
 
-    sprintf(buffer,"%d",seccount);
-    lcd_show_string(10, 140, 240, 24, 24, buffer, BLUE);
+    // sprintf(buffer,"%d",seccount);
+    // lcd_show_string(10, 140, 240, 24, 24, buffer, BLUE);
     delay_ms(501);
     /* USER CODE BEGIN 3 */
 
