@@ -23,6 +23,17 @@ uint8_t rtc_init(void) {
     }
 }
 
+void rtc_deinit(void) {
+    __HAL_RCC_BKP_CLK_DISABLE();
+    __HAL_RCC_PWR_CLK_DISABLE();
+    HAL_PWR_DisableBkUpAccess();
+    // g_rtc_handle.Instance = RTC;
+    // HAL_RTC_DeInit(&g_rtc_handle);
+    //关闭LSE
+    RCC->BDCR &= ~(1 << 0);   //BDCR 0位
+    RCC->BDCR &= ~(1 << 15);   //BDCR 15位
+}
+
 void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc) {
     __HAL_RCC_RTC_ENABLE();     // RTC时钟使能
 

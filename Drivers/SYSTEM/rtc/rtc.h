@@ -21,6 +21,7 @@ typedef struct
 extern calendar_obj g_calendar;
 
 uint8_t rtc_init(void);
+void rtc_deinit(void);
 uint32_t rtc_set_time(uint16_t syear, uint8_t smon, uint8_t sday, uint8_t hour, uint8_t min, uint8_t sec);
 calendar_obj rtc_get_time(void);
 void rtc_write_bkr(uint32_t bkrx, uint16_t data);

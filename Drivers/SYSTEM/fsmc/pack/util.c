@@ -73,7 +73,7 @@ void lcd_clear(uint16_t color) {
     lcd_set_cursor(0x0000, 0x0000);
     lcd_write_ram_prepare();
 
-    for (uint32_t index; index < totalpoint; index++) {
+    for (uint32_t index=0; index < totalpoint; index++) {
         lcd_wr_data(color);
     }
 }

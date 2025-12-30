@@ -31,10 +31,15 @@
 #include "stm32f1xx_hal_uart.h"
 #include "../sys/sys.h"
 
+#define USART_REC_LEN               200         /* 定义最大接收字节数 200 */
+#define USART_EN_RX                 1           /* 使能（1）/禁止（0）串口1接收 */
+#define RXBUFFERSIZE                1           /* 缓存大小 */
+extern UART_HandleTypeDef g_uart1_handle;
 
 extern UART_HandleTypeDef g_huart;
-extern uint8_t g_rx_buffer[1];
-extern _Bool g_rx_flag;
+extern uint8_t  g_usart_rx_buf[USART_REC_LEN];  /* 接收缓冲.末字节为换行符 */
+extern uint16_t g_usart_rx_sta;                 /* 接收状态标记 */
+extern uint8_t g_rx_buffer[RXBUFFERSIZE];       /* 接收Buffer */
 
 void usart_init(uint32_t bound);                /* 串口初始化函数 */
 

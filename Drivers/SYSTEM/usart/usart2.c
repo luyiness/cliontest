@@ -7,8 +7,10 @@
 #endif
 
 UART_HandleTypeDef g_huart;
-uint8_t g_rx_buffer[1];
-_Bool g_rx_flag = 0;
+uint8_t g_usart_rx_buf[USART_REC_LEN];
+uint16_t g_usart_rx_sta = 0;
+uint8_t g_rx_buffer[RXBUFFERSIZE];  /* HAL库使用的串口接收缓冲 */
+UART_HandleTypeDef g_uart1_handle;  /* UART句柄 */
 
 void usart_init(uint32_t baudrate) {
     //1、初始化串口1
@@ -23,7 +25,7 @@ void usart_init(uint32_t baudrate) {
     HAL_UART_Init(&g_huart);  //调用hal库的Uart初始化函数，其会间接调用msp callback；
 
     //3、开启接收中断
-    HAL_UART_Receive_IT(&g_huart, (uint8_t*)g_rx_buffer, 1);
+    HAL_UART_Receive_IT(&g_huart, (uint8_t*)g_rx_buffer, RXBUFFERSIZE);
 }
 
 //2、msp callback
@@ -53,9 +55,39 @@ void USART1_IRQHandler(void) {
     HAL_UART_Receive_IT(&g_huart, (uint8_t*)g_rx_buffer, 1);  //因为上一行会清除接收中断标志位，此处再开启；
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    if (huart->Instance == USART1) {
-        g_rx_flag = 1;  //接收到数据了，g_rx_flag=1
-    }
+    if (huart->Instance == USART1) {                   /* 如果是串口1 */
+         if ((g_usart_rx_sta & 0x8000) == 0)             /* 接收未完成 */
+         {
+             if (g_usart_rx_sta & 0x4000)                /* 接收到了0x0d（即回车键）\r */
+             {
+                 if (g_rx_buffer[0] != 0x0a)             /* 接收到的不是0x0a  \n */
+                 {
+                     g_usart_rx_sta = 0;                 /* 接收错误,重新开始 */
+                 }
+                 else                                    /* 接收到的是0x0a（即换行键） */
+                 {
+                     g_usart_rx_sta |= 0x8000;           /* 接收完成 */
+                 }
+             }
+             else                                        /* 还没收到0X0d（即回车键） */
+             {
+                 if (g_rx_buffer[0] == 0x0d)
+                     g_usart_rx_sta |= 0x4000;
+                 else
+                 {
+                     g_usart_rx_buf[g_usart_rx_sta & 0X3FFF] = g_rx_buffer[0];  //接受的数据放入g_usart_rx_buf
+                     g_usart_rx_sta++;
+
+                     if (g_usart_rx_sta > (USART_REC_LEN - 1))
+                     {
+                         g_usart_rx_sta = 0;             /* 接收数据错误,重新开始接收 */
+                     }
+                 }
+             }
+         }
+
+         HAL_UART_Receive_IT(&g_uart1_handle, (uint8_t *)g_rx_buffer, RXBUFFERSIZE);
+     }
 }
 
 /******************************************************************************************/

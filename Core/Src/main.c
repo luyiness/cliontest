@@ -28,6 +28,7 @@
 #include "../../Drivers/SYSTEM/fsmc/fsmc_lcd.h"
 #include "../../Drivers/SYSTEM/fsmc/pack/util.h"
 #include "../../Drivers/SYSTEM/rtc/rtc.h"
+#include "../../Drivers/SYSTEM/usmart/usmart.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -102,7 +103,8 @@ int main(void)
   // key_init();
   // tpad_init();
   fsmc_lcd_init();
-  rtc_init();
+  // rtc_deinit();
+  usmart_dev.init(72);  //usmart
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -111,15 +113,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
     /* USER CODE END WHILE */
-    calendar_obj calendar = rtc_get_time();
-    char buffer[100];
-    sprintf(buffer,"%dY %dM %dD",calendar.year,calendar.month,calendar.date);
-    lcd_show_string(10, 80, 240, 24, 24, buffer, RED);
-    sprintf(buffer,"%d:%d:%d",calendar.hour,calendar.min,calendar.sec);
-    lcd_show_string(10, 110, 240, 24, 24, buffer, RED);
-
-    // sprintf(buffer,"%d",seccount);
-    // lcd_show_string(10, 140, 240, 24, 24, buffer, BLUE);
     delay_ms(501);
     /* USER CODE BEGIN 3 */
 
