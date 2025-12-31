@@ -19,7 +19,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "gpio.h"
+#include "string.h"
 #include "../../Drivers/SYSTEM/delay/delay.h"
+#include "../../Drivers/SYSTEM/dma/dma.h"
 #include "../../Drivers/SYSTEM/led/led.h"
 #include "../../Drivers/SYSTEM/key/key.h"
 #include "../../Drivers/SYSTEM/usart/usart2.h"
@@ -102,29 +104,39 @@ int main(void)
   led_init();
   usart_init(115200);
   RetargetInit(&g_huart); //初始化printf
-  // key_init();
+  key_init();
   // tpad_init();
-  // fsmc_lcd_init();
+  fsmc_lcd_init();
   // rtc_deinit();
   // usmart_dev.init(72);  //usmart
   // wkup_init();
-  pvd_init();
+  // pvd_init();
+  dma_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  for (int i = 0; i < 10; i++) {
+    src_buf[i] = i*3;
+  }
   uint8_t key = 0;
   while (1) {
     /* USER CODE END WHILE */
-    if (pvdo == 1) {
-      printf("PVDO=1");
-      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-    }else if (pvdo == 2) {
-      printf("PVDO=0");
-      HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
+    key = key_scan(1);
+    if (key == KEY0_PRES) {
+      memset(dest_buf, 0, sizeof(dest_buf));    //初始化dest_buf
+      dma_enable_transmit(10);    //dma传输
+      while (1) {
+        if (__HAL_DMA_GET_FLAG(&g_dma_handle, DMA_FLAG_TC1)) {
+          __HAL_DMA_CLEAR_FLAG(&g_dma_handle, DMA_FLAG_TC1);
+          lcd_show_string(10, 80, 240, 24, 24, "transmit succeed!", RED);
+          break;
+        }
+      }
     }
+
     delay_ms(500);
     /* USER CODE BEGIN 3 */
 
