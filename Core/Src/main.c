@@ -30,6 +30,7 @@
 #include "../../Drivers/SYSTEM/rtc/rtc.h"
 #include "../../Drivers/SYSTEM/usmart/usmart.h"
 #include "../../Drivers/SYSTEM/pwr/pwrlow.h"
+#include "../../Drivers/SYSTEM/pwr/pvd.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -101,12 +102,13 @@ int main(void)
   led_init();
   usart_init(115200);
   RetargetInit(&g_huart); //初始化printf
-  key_init();
+  // key_init();
   // tpad_init();
   // fsmc_lcd_init();
   // rtc_deinit();
   // usmart_dev.init(72);  //usmart
-  wkup_init();
+  // wkup_init();
+  pvd_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -116,34 +118,13 @@ int main(void)
   uint8_t key = 0;
   while (1) {
     /* USER CODE END WHILE */
-    key = key_scan(0);
-    if (key) {
-      switch (key) {
-        case KEY1_PRES:  /* 进入待机模式 */
-          __HAL_RCC_PWR_CLK_ENABLE();   //使能电源时钟；因为standby模式电压调节器是关闭的，唤醒时需时钟（我的理解）
-          HAL_PWR_EnableWakeUpPin(PWR_WAKEUP_PIN1);  //WKUP引脚使能
-          __HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);  //清除WUF标志
-          printf("Enter STANDBY Mode \r\n");
-          HAL_PWR_EnterSTANDBYMode();
-          printf("Exit STANDBY Mode \r\n");   //这一句不会打印的，因为standby唤醒后复位；
-          break;
-        // case KEY1_PRES:    /* 进入停止模式 */
-        //   printf("Enter STOP Mode \r\n");
-        //   HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,PWR_STOPENTRY_WFI);
-        //   //还要初始化系统时钟成HSE
-        //   SystemClock_Config();
-        //   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK_DIV8); //systick
-        //   HAL_SuspendTick();
-        //   printf("Exit STOP Mode \r\n");
-        //   break;
-        case KEY0_PRES:   /* 进入睡眠模式 */
-          printf("Enter SLEEP Mode \r\n");
-          HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON,PWR_SLEEPENTRY_WFI);
-          printf("Exit SLEEP Mode \r\n");
-          break;
-      }
+    if (pvdo == 1) {
+      printf("PVDO=1");
+      HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+    }else if (pvdo == 2) {
+      printf("PVDO=0");
+      HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_5);
     }
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
     delay_ms(500);
     /* USER CODE BEGIN 3 */
 
