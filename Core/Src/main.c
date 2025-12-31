@@ -68,7 +68,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+const uint8_t TEXT_TO_SEND[] = {"20260101 next year, full vigor, go aboard, knowledge getten!"}; /* 要循环发送的字符串 */
+#define SEND_BUF_SIZE       (sizeof(TEXT_TO_SEND) + 2) * 200        /* 发送数据长度, 等于sizeof(TEXT_TO_SEND) + 2（\r\n）的200倍. */
+uint8_t g_sendbuf[SEND_BUF_SIZE];   /* 发送数据缓冲区 */
 /* USER CODE END 0 */
 
 /**
@@ -111,30 +113,62 @@ int main(void)
   // usmart_dev.init(72);  //usmart
   // wkup_init();
   // pvd_init();
-  dma_init();
+  dma2_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  for (int i = 0; i < 10; i++) {
-    src_buf[i] = i*3;
+
+  uint16_t i, k=0;
+  uint8_t  mask = 0;
+  float pro = 0;          /* 进度 */
+  uint16_t len = sizeof(TEXT_TO_SEND);  //数据本身长度； SEND_BUF_SIZE总发送长度：数据加上"\r\n"后的长度*200次发送
+  for (i = 0; i < SEND_BUF_SIZE; i++) { /* 填充ASCII字符集数据 */
+    //此循环是将TEXT_TO_SEND复制到g_sendbuf
+    if (k >= len) {
+      if (mask) {     //第三步：结尾加上\n； 然后k=0 继续循环到第一步
+        g_sendbuf[i] = 0x0a;
+        k = 0;
+      }
+      else {      //第二步：结尾加上\r
+        g_sendbuf[i] = 0x0d;
+        mask++;
+      }
+    } else {    //第一步：复制第一个元素
+      mask = 0;
+      g_sendbuf[i] = TEXT_TO_SEND[k];
+      k++;
+    }
   }
-  uint8_t key = 0;
+  i = 0;
+  uint8_t  key = 0;
   while (1) {
-    /* USER CODE END WHILE */
-    key = key_scan(1);
-    if (key == KEY0_PRES) {
-      memset(dest_buf, 0, sizeof(dest_buf));    //初始化dest_buf
-      dma_enable_transmit(10);    //dma传输
+    key = key_scan(0);
+    if (key == KEY0_PRES)       /* KEY0按下 */
+    {
+      printf("\r\nDMA DATA:\r\n");
+      lcd_show_string(30, 130, 200, 16, 16, "Start Transimit....", BLUE);
+      lcd_show_string(30, 150, 200, 16, 16, "   %", BLUE);    /* 显示百分号 */
+      HAL_UART_Transmit_DMA(&g_huart, g_sendbuf, SEND_BUF_SIZE);
       while (1) {
-        if (__HAL_DMA_GET_FLAG(&g_dma_handle, DMA_FLAG_TC1)) {
-          __HAL_DMA_CLEAR_FLAG(&g_dma_handle, DMA_FLAG_TC1);
-          lcd_show_string(10, 80, 240, 24, 24, "transmit succeed!", RED);
+        if ( __HAL_DMA_GET_FLAG(&g_dma_handle, DMA_FLAG_TC4))   /* 等待传输完成 */
+        {
+          __HAL_DMA_CLEAR_FLAG(&g_dma_handle, DMA_FLAG_TC4);  /* 清除传输完成标志 */
+          HAL_UART_DMAStop(&g_huart);                  /* 传输完成以后关闭串口DMA */
           break;
         }
+
+        //算百分比
+        pro = __HAL_DMA_GET_COUNTER(&g_dma_handle);
+        len = SEND_BUF_SIZE;
+        pro = 1 - (pro / len);
+        pro *= 100;
+        lcd_show_num(30, 150, pro, 3, 16, BLUE);
       }
+      lcd_show_num(30, 150, 100, 3, 16, BLUE);    /* 显示100% */
+      lcd_show_string(30, 130, 200, 16, 16, "Transimit Finished!", BLUE); /* 提示传送完成 */
     }
 
     delay_ms(500);

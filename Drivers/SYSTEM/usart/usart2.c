@@ -52,7 +52,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart) {
 //usart1中断服务函数
 void USART1_IRQHandler(void) {
     HAL_UART_IRQHandler(&g_huart);
-    HAL_UART_Receive_IT(&g_huart, (uint8_t*)g_rx_buffer, 1);  //因为上一行会清除接收中断标志位，此处再开启；
+    // HAL_UART_Receive_IT(&g_huart, (uint8_t*)g_rx_buffer, 1);  //因为上一行会清除接收中断标志位，此处再开启；
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART1) {                   /* 如果是串口1 */
