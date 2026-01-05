@@ -123,35 +123,20 @@ int main(void)
   const uint16_t BUFFER_SIZE = 10;
   uint16_t buffer[BUFFER_SIZE];
   adc1_init();
-  adc_dma_init((uint32_t)&buffer);
+  // adc_dma_init((uint32_t)&buffer);
   uint32_t sum;
-  double temperature;
+  double photo;
   lcd_show_string(30, 110, 200, 16, 16, "ADC1_CH16_VAL:", BLUE);
-  lcd_show_string(30, 130, 200, 16, 16, "TEMPERATE: 00.000C", BLUE); /* 固定位置显示小数点 */
-  adc_dma_enable(BUFFER_SIZE);  //
+  lcd_show_string(30, 130, 200, 16, 16, "PHOTO: 00", BLUE); /* 固定位置显示小数点 */
+  // adc_dma_enable(BUFFER_SIZE);  //
   while (1) {
-    if (g_adc_dma_flag == 1) {
-      /* 计算DMA 采集到的ADC数据的平均值 */
-      sum = 0;
-      for (int i = 0; i < BUFFER_SIZE; i++)   /* 累加 */
-      {
-        sum += buffer[i];
-      }
-      adcx = sum / BUFFER_SIZE;
+    if (1) {
+      adcx = getADCResult();
       lcd_show_xnum(134, 110, adcx, 5, 16, 0, BLUE);   /* 显示ADC采样后的原始值 */
 
       //计算电压值：
-      temperature = adcx * (3.3 / 4096);
-      temperature = (1.43 - temperature) / 0.0043 + 25;
-      if (temperature < 0) {
-        temperature = -temperature;
-        lcd_show_string(30 + 10 * 8, 120, 16, 16, 16, "-", BLUE);   /* 显示负号 */
-      }
-      adcx = temperature;      //adcx=整数部分
-      lcd_show_xnum(30 + 11 * 8, 130, adcx, 2, 16, 0, BLUE);  //显示整数部分
-      temperature -= adcx;   //小数部分
-      temperature *= 1000;   //小数部分乘以1000，例如：0.1111就转换为111.1，相当于保留三位小数
-      lcd_show_xnum(30 + 14 * 8, 130, temperature, 3, 16, 0X80, BLUE);   //显示小数部分，比如显示111
+      photo = 100 - adcx / 40.95;   //0~4095转成0~100
+      lcd_show_xnum(30 + 7 * 8, 130, photo, 2, 16, 0, BLUE);  //显示整数部分
 
       //下一次采集准备
       g_adc_dma_flag = 0;

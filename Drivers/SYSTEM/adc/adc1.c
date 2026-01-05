@@ -7,7 +7,7 @@
 ADC_HandleTypeDef g_adc_handle;
 
 void adc1_init() {
-    g_adc_handle.Instance = ADC1;
+    g_adc_handle.Instance = ADC3;
     g_adc_handle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
     g_adc_handle.Init.ScanConvMode = DISABLE;       //扫描
     g_adc_handle.Init.ContinuousConvMode = ENABLE;     //单次/连续
@@ -19,21 +19,21 @@ void adc1_init() {
 
     //通道设置：初始化6个通道，并设置执行顺序rank
     ADC_ChannelConfTypeDef sConfig;
-    sConfig.Channel = ADC_CHANNEL_16;    //通道序号
+    sConfig.Channel = ADC_CHANNEL_6;    //通道序号
     sConfig.Rank = ADC_REGULAR_RANK_1;  //rank
     sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES_5;  //采样sample时间
     HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);     //当设为通道-16时，此函数会帮我们TSVREFE置1
 }
 
 void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc) {
-    if (hadc->Instance == ADC1) {
+    if (hadc->Instance == ADC3) {
         //PA1初始化
-        // __HAL_RCC_GPIOA_CLK_ENABLE();
-        // GPIO_InitTypeDef gpio_InitStruct = {GPIO_PIN_1, GPIO_MODE_ANALOG, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};   //注意GPIO模式是模拟输入
-        // HAL_GPIO_Init(GPIOA, &gpio_InitStruct);
+        __HAL_RCC_GPIOF_CLK_ENABLE();
+        GPIO_InitTypeDef gpio_InitStruct = {GPIO_PIN_8, GPIO_MODE_ANALOG, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};   //注意GPIO模式是模拟输入
+        HAL_GPIO_Init(GPIOF, &gpio_InitStruct);
 
         //ADC时钟使能
-        __HAL_RCC_ADC1_CLK_ENABLE();
+        __HAL_RCC_ADC3_CLK_ENABLE();
 
         //设置扩展外设时钟，如：ADC、RTC
         RCC_PeriphCLKInitTypeDef  periphClkInit;
