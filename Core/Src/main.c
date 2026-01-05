@@ -21,7 +21,6 @@
 #include "gpio.h"
 #include "string.h"
 #include "../../Drivers/SYSTEM/delay/delay.h"
-#include "../../Drivers/SYSTEM/dma/dma.h"
 #include "../../Drivers/SYSTEM/led/led.h"
 #include "../../Drivers/SYSTEM/key/key.h"
 #include "../../Drivers/SYSTEM/usart/usart2.h"
@@ -113,30 +112,47 @@ int main(void)
   // wkup_init();
   // pvd_init();
   // dma2_init();
-  adc1_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint16_t adcx;    //ADC转换结果
+  const uint16_t BUFFER_SIZE = 10;
+  uint16_t buffer[BUFFER_SIZE];
+  adc1_init();
+  adc_dma_init((uint32_t)&buffer);
+  adc_dma_enable(BUFFER_SIZE);  //
+  uint32_t sum;
+  uint32_t average;
   float temp;
   lcd_show_string(30, 110, 200, 16, 16, "ADC1_CH1_VAL:", BLUE);
   lcd_show_string(30, 130, 200, 16, 16, "ADC1_CH1_VOL:0.000V", BLUE); /* 固定位置显示小数点 */
   while (1) {
-    adcx = getADCResult();
-    lcd_show_xnum(134, 110, adcx, 5, 16, 0, BLUE);
+    if (g_adc_dma_flag == 1) {
+      /* 计算DMA 采集到的ADC数据的平均值 */
+      sum = 0;
+      for (int i = 0; i < BUFFER_SIZE; i++)   /* 累加 */
+      {
+        sum += buffer[i];
+      }
+      average = sum / BUFFER_SIZE;           /* 取平均值 */
+      lcd_show_xnum(134, 110, average, 5, 16, 0, BLUE);
 
-    //计算电压值：
-    temp = (float)adcx * (3.3 / 4096);  //adcx * 分辨率
-    adcx = temp;      //adcx=整数部分
-    lcd_show_xnum(134, 130, adcx, 1, 16, 0, BLUE);  //显示整数部分
+      //计算电压值：
+      temp = (float)average * (3.3 / 4096);  //adcx * 分辨率
+      average = temp;      //adcx=整数部分
+      lcd_show_xnum(134, 130, average, 1, 16, 0, BLUE);  //显示整数部分
 
-    temp -= adcx;   //小数部分
-    temp *= 1000;   //小数部分乘以1000，例如：0.1111就转换为111.1，相当于保留三位小数
-    lcd_show_xnum(150, 130, temp, 3, 16, 0X80, BLUE);   //显示小数部分，比如显示111
+      temp -= average;   //小数部分
+      temp *= 1000;   //小数部分乘以1000，例如：0.1111就转换为111.1，相当于保留三位小数
+      lcd_show_xnum(150, 130, temp, 3, 16, 0X80, BLUE);   //显示小数部分，比如显示111
 
+      printf("1\r\n");
+      //下一次采集准备
+      g_adc_dma_flag = 0;
+      adc_dma_enable(BUFFER_SIZE);
+    }
     delay_ms(100);
     /* USER CODE BEGIN 3 */
 

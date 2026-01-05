@@ -10,7 +10,7 @@ void adc1_init() {
     g_adc_handle.Instance = ADC1;
     g_adc_handle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
     g_adc_handle.Init.ScanConvMode = DISABLE;       //是否扫描
-    g_adc_handle.Init.ContinuousConvMode = DISABLE;     //单次/连续
+    g_adc_handle.Init.ContinuousConvMode = ENABLE;     //单次/连续
     g_adc_handle.Init.NbrOfConversion = 1;
     g_adc_handle.Init.ExternalTrigConv = ADC_SOFTWARE_START;    //软件触发
     HAL_ADC_Init(&g_adc_handle);
