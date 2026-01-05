@@ -33,6 +33,7 @@
 #include "../../Drivers/SYSTEM/usmart/usmart.h"
 #include "../../Drivers/SYSTEM/pwr/pwrlow.h"
 #include "../../Drivers/SYSTEM/pwr/pvd.h"
+#include "../../Drivers/SYSTEM/adc/adc1.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -68,9 +69,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-const uint8_t TEXT_TO_SEND[] = {"20260101 next year, full vigor, go aboard, knowledge getten!"}; /* 要循环发送的字符串 */
-#define SEND_BUF_SIZE       (sizeof(TEXT_TO_SEND) + 2) * 200        /* 发送数据长度, 等于sizeof(TEXT_TO_SEND) + 2（\r\n）的200倍. */
-uint8_t g_sendbuf[SEND_BUF_SIZE];   /* 发送数据缓冲区 */
+
 /* USER CODE END 0 */
 
 /**
@@ -103,75 +102,42 @@ int main(void)
 
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
-  led_init();
+  // led_init();
   usart_init(115200);
   RetargetInit(&g_huart); //初始化printf
-  key_init();
+  // key_init();
   // tpad_init();
   fsmc_lcd_init();
   // rtc_deinit();
   // usmart_dev.init(72);  //usmart
   // wkup_init();
   // pvd_init();
-  dma2_init();
+  // dma2_init();
+  adc1_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
-  uint16_t i, k=0;
-  uint8_t  mask = 0;
-  float pro = 0;          /* 进度 */
-  uint16_t len = sizeof(TEXT_TO_SEND);  //数据本身长度； SEND_BUF_SIZE总发送长度：数据加上"\r\n"后的长度*200次发送
-  for (i = 0; i < SEND_BUF_SIZE; i++) { /* 填充ASCII字符集数据 */
-    //此循环是将TEXT_TO_SEND复制到g_sendbuf
-    if (k >= len) {
-      if (mask) {     //第三步：结尾加上\n； 然后k=0 继续循环到第一步
-        g_sendbuf[i] = 0x0a;
-        k = 0;
-      }
-      else {      //第二步：结尾加上\r
-        g_sendbuf[i] = 0x0d;
-        mask++;
-      }
-    } else {    //第一步：复制第一个元素
-      mask = 0;
-      g_sendbuf[i] = TEXT_TO_SEND[k];
-      k++;
-    }
-  }
-  i = 0;
-  uint8_t  key = 0;
+  uint16_t adcx;    //ADC转换结果
+  float temp;
+  lcd_show_string(30, 110, 200, 16, 16, "ADC1_CH1_VAL:", BLUE);
+  lcd_show_string(30, 130, 200, 16, 16, "ADC1_CH1_VOL:0.000V", BLUE); /* 固定位置显示小数点 */
   while (1) {
-    key = key_scan(0);
-    if (key == KEY0_PRES)       /* KEY0按下 */
-    {
-      printf("\r\nDMA DATA:\r\n");
-      lcd_show_string(30, 130, 200, 16, 16, "Start Transimit....", BLUE);
-      lcd_show_string(30, 150, 200, 16, 16, "   %", BLUE);    /* 显示百分号 */
-      HAL_UART_Transmit_DMA(&g_huart, g_sendbuf, SEND_BUF_SIZE);
-      while (1) {
-        if ( __HAL_DMA_GET_FLAG(&g_dma_handle, DMA_FLAG_TC4))   /* 等待传输完成 */
-        {
-          __HAL_DMA_CLEAR_FLAG(&g_dma_handle, DMA_FLAG_TC4);  /* 清除传输完成标志 */
-          HAL_UART_DMAStop(&g_huart);                  /* 传输完成以后关闭串口DMA */
-          break;
-        }
+    adcx = getADCResult();
+    lcd_show_xnum(134, 110, adcx, 5, 16, 0, BLUE);
 
-        //算百分比
-        pro = __HAL_DMA_GET_COUNTER(&g_dma_handle);
-        len = SEND_BUF_SIZE;
-        pro = 1 - (pro / len);
-        pro *= 100;
-        lcd_show_num(30, 150, pro, 3, 16, BLUE);
-      }
-      lcd_show_num(30, 150, 100, 3, 16, BLUE);    /* 显示100% */
-      lcd_show_string(30, 130, 200, 16, 16, "Transimit Finished!", BLUE); /* 提示传送完成 */
-    }
+    //计算电压值：
+    temp = (float)adcx * (3.3 / 4096);  //adcx * 分辨率
+    adcx = temp;      //adcx=整数部分
+    lcd_show_xnum(134, 130, adcx, 1, 16, 0, BLUE);  //显示整数部分
 
-    delay_ms(500);
+    temp -= adcx;   //小数部分
+    temp *= 1000;   //小数部分乘以1000，例如：0.1111就转换为111.1，相当于保留三位小数
+    lcd_show_xnum(150, 130, temp, 3, 16, 0X80, BLUE);   //显示小数部分，比如显示111
+
+    delay_ms(100);
     /* USER CODE BEGIN 3 */
 
   }
