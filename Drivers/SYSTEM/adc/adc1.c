@@ -9,9 +9,9 @@ ADC_HandleTypeDef g_adc_handle;
 void adc1_init() {
     g_adc_handle.Instance = ADC1;
     g_adc_handle.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-    g_adc_handle.Init.ScanConvMode = ENABLE;       //扫描
+    g_adc_handle.Init.ScanConvMode = DISABLE;       //扫描
     g_adc_handle.Init.ContinuousConvMode = ENABLE;     //单次/连续
-    g_adc_handle.Init.NbrOfConversion = 6;      //0~5个通道
+    g_adc_handle.Init.NbrOfConversion = 1;      //0~5个通道
     g_adc_handle.Init.ExternalTrigConv = ADC_SOFTWARE_START;    //软件触发
     HAL_ADC_Init(&g_adc_handle);
 
@@ -19,25 +19,9 @@ void adc1_init() {
 
     //通道设置：初始化6个通道，并设置执行顺序rank
     ADC_ChannelConfTypeDef sConfig;
-    sConfig.Channel = ADC_CHANNEL_0;    //通道序号
-    sConfig.Rank = ADC_REGULAR_RANK_1;  //rank
-    sConfig.SamplingTime = ADC_SAMPLETIME_239CYCLES_5;  //采样sample时间
-    HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);
-
     sConfig.Channel = ADC_CHANNEL_1;    //通道序号
-    sConfig.Rank = ADC_REGULAR_RANK_2;  //rank
-    HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);
-    sConfig.Channel = ADC_CHANNEL_2;    //通道序号
-    sConfig.Rank = ADC_REGULAR_RANK_3;  //rank
-    HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);
-    sConfig.Channel = ADC_CHANNEL_3;    //通道序号
-    sConfig.Rank = ADC_REGULAR_RANK_4;  //rank
-    HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);
-    sConfig.Channel = ADC_CHANNEL_4;    //通道序号
-    sConfig.Rank = ADC_REGULAR_RANK_5;  //rank
-    HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);
-    sConfig.Channel = ADC_CHANNEL_5;    //通道序号
-    sConfig.Rank = ADC_REGULAR_RANK_6;  //rank
+    sConfig.Rank = ADC_REGULAR_RANK_1;  //rank
+    sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;  //采样sample时间
     HAL_ADC_ConfigChannel(&g_adc_handle, &sConfig);
 }
 
@@ -46,7 +30,6 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc) {
         //PA1初始化
         __HAL_RCC_GPIOA_CLK_ENABLE();
         GPIO_InitTypeDef gpio_InitStruct = {GPIO_PIN_1, GPIO_MODE_ANALOG, GPIO_NOPULL, GPIO_SPEED_FREQ_HIGH};   //注意GPIO模式是模拟输入
-        gpio_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5;  //初始化PA0~5
         HAL_GPIO_Init(GPIOA, &gpio_InitStruct);
 
         //ADC时钟使能
