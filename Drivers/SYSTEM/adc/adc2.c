@@ -15,7 +15,7 @@ void adc_dma_init(uint32_t mar) {
     g_dma_adc_handle.Init.PeriphInc = DMA_PINC_DISABLE;  //从DR读，故不需自增
     g_dma_adc_handle.Init.MemInc = DMA_MINC_ENABLE;      //写内存地址，自增
     g_dma_adc_handle.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;    //一次16位
-    g_dma_adc_handle.Init.MemDataAlignment = DMA_PDATAALIGN_HALFWORD;       //一次16位
+    g_dma_adc_handle.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;       //一次16位；注意易错DMA_MDATAALIGN_HALFWORD
     g_dma_adc_handle.Init.Mode = DMA_NORMAL;    //Normal mode or Circular mode
     g_dma_adc_handle.Init.Priority = DMA_PRIORITY_MEDIUM;      //Priority level
     HAL_DMA_Init(&g_dma_adc_handle);
