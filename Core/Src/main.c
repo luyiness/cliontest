@@ -108,7 +108,7 @@ int main(void)
   // key_init();
   // tpad_init();
   fsmc_lcd_init();
-  adc1_init();
+  // adc1_init();
   dac_init();
   /* USER CODE BEGIN 2 */
 
@@ -121,24 +121,9 @@ int main(void)
   lcd_show_string(15, 110, 200, 24, 24, "DAC1_VAL: ", BLUE);
   lcd_show_string(15, 110+30*1, 200, 24, 24, "ADC_VAL: ", BLUE);
   lcd_show_string(15, 110+30*2, 200, 24, 24, "ADC: 0.000v", BLUE); /* 固定位置显示小数点 */
-  set_Voltage(2000);
+  // set_Voltage(2000);
   while (1) {
-    uint16_t dac_dor = DAC1->DOR1 & 0xFFF;
-    lcd_show_xnum(15+10*12, 110, dac_dor, 5, 24, 0, BLUE); //DAC的DOR1寄存器值
-
-    adcx = getADCResult();
-    lcd_show_xnum(15+9*12, 110+30*1, adcx, 5, 24, 0, BLUE);   /* 显示ADC采样后的原始值 */
-
-    //计算电压值：
-    temp = (float)adcx * (3.3 / 4096);  //adcx * 分辨率
-    adcx = temp;      //adcx=整数部分
-    lcd_show_xnum(15+5*12, 110+30*2, adcx, 1, 24, 0, BLUE);  //显示整数部分
-
-    delay_ms(500);
-    temp -= adcx;   //小数部分
-    temp *= 1000;   //小数部分乘以1000，例如：0.1111就转换为111.1，相当于保留三位小数
-    lcd_show_xnum(15+7*12, 110+30*2, temp, 3, 24, 0X80, BLUE);   //显示小数部分，比如显示111
-
+    dac_triangular_wave(4095, 500, 20, 100); /* 幅值4095, 采样点间隔500us, 20个采样点, 100个波形 */
     //下一次采
     delay_ms(300);
     /* USER CODE BEGIN 3 */
