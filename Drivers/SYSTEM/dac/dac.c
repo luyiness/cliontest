@@ -11,7 +11,7 @@ void dac_init() {
     HAL_DAC_Init(&g_dac_handle);
 
     DAC_ChannelConfTypeDef sConfig;
-    sConfig.DAC_Trigger = DAC_TRIGGER_NONE;     //禁止触发
+    sConfig.DAC_Trigger = DAC_TRIGGER_T7_TRGO;     //禁止触发
     sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_DISABLE;    //关闭缓冲
     HAL_DAC_ConfigChannel(&g_dac_handle,&sConfig,DAC_CHANNEL_1);
 

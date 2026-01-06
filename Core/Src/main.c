@@ -32,7 +32,6 @@
 #include "../../Drivers/SYSTEM/usmart/usmart.h"
 #include "../../Drivers/SYSTEM/pwr/pwrlow.h"
 #include "../../Drivers/SYSTEM/pwr/pvd.h"
-#include "../../Drivers/SYSTEM/adc/adc1.h"
 #include "../../Drivers/SYSTEM/dac/dac.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -116,16 +115,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  volatile uint16_t adcx;    //ADC转换结果
-  volatile double temp;
-  lcd_show_string(15, 110, 200, 24, 24, "DAC1_VAL: ", BLUE);
-  lcd_show_string(15, 110+30*1, 200, 24, 24, "ADC_VAL: ", BLUE);
-  lcd_show_string(15, 110+30*2, 200, 24, 24, "ADC: 0.000v", BLUE); /* 固定位置显示小数点 */
-  // set_Voltage(2000);
+  uint16_t adcx;
+  uint8_t x = 0;
+  dac_dma_init();
+  dac_creat_sin_buf(4095,100);
+  dac_dma_wave_enable(100,200-1,72-1);   //100个点,timer的超时时间=10us，故得到1Khz的正弦波
   while (1) {
-    dac_triangular_wave(4095, 500, 20, 100); /* 幅值4095, 采样点间隔500us, 20个采样点, 100个波形 */
+    adcx = DAC1->DHR12R1;                               /* 获取DAC1_OUT1的输出状态 */
+    lcd_draw_point(x++,adcx/28+100,BLUE);
+    if (x >240) x = 0;
     //下一次采
-    delay_ms(300);
+    delay_ms(20);
     /* USER CODE BEGIN 3 */
 
   }
