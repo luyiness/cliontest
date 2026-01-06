@@ -33,6 +33,7 @@
 #include "../../Drivers/SYSTEM/pwr/pwrlow.h"
 #include "../../Drivers/SYSTEM/pwr/pvd.h"
 #include "../../Drivers/SYSTEM/dac/dac.h"
+#include "../../Drivers/SYSTEM/iic/iic.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -102,30 +103,34 @@ int main(void)
   /* Initialize all configured peripherals */
   // MX_GPIO_Init();
   // led_init();
-  usart_init(115200);
-  RetargetInit(&g_huart); //初始化printf
-  // key_init();
+  // usart_init(115200);
+  // RetargetInit(&g_huart); //初始化printf
+  key_init();
   // tpad_init();
   fsmc_lcd_init();
   // adc1_init();
-  dac_init();
+  // dac_init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  uint16_t adcx;
-  uint8_t x = 0;
-  dac_dma_init();
-  dac_creat_sin_buf(4095,100);
-  dac_dma_wave_enable(100,200-1,72-1);   //100个点,timer的超时时间=10us，故得到1Khz的正弦波
+  uint8_t key;
+  uint8_t data;
+  iic_init();
+  lcd_show_string(15, 110, 200, 24, 24, "Init success...", BLUE);
   while (1) {
-    adcx = DAC1->DHR12R1;                               /* 获取DAC1_OUT1的输出状态 */
-    lcd_draw_point(x++,adcx/28+100,BLUE);
-    if (x >240) x = 0;
-    //下一次采
-    delay_ms(20);
+    key = key_scan(0);
+    if (key == KEY1_PRES) {
+      at24c02_write_one_byte(100,37);    //在地址100处 写入数据37
+      lcd_show_string(15, 140, 200, 24, 24, "write success...", BLUE);
+    } else if (key == KEY0_PRES) {
+      data = at24c02_read_one_byte(100);
+      lcd_show_string(15, 140, 200, 24, 24, "read:           ", BLUE);
+      lcd_show_num(15+6*12, 140, data, 3, 24, BLUE);
+    }
+    delay_ms(100);
     /* USER CODE BEGIN 3 */
 
   }
