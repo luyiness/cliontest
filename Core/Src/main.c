@@ -34,6 +34,7 @@
 #include "../../Drivers/SYSTEM/pwr/pvd.h"
 #include "../../Drivers/SYSTEM/dac/dac.h"
 #include "../../Drivers/SYSTEM/iic/iic.h"
+#include "../../Drivers/SYSTEM/spi/norflash.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -118,15 +119,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   uint8_t key;
   uint8_t data;
-  iic_init();
+  norflash_init();
   lcd_show_string(15, 110, 200, 24, 24, "Init success...", BLUE);
   while (1) {
     key = key_scan(0);
     if (key == KEY1_PRES) {
-      at24c02_write_one_byte(100,37);    //在地址100处 写入数据37
+      norflash_write_page(0x123457,37);    //在地址100处 写入数据37
       lcd_show_string(15, 140, 200, 24, 24, "write success...", BLUE);
     } else if (key == KEY0_PRES) {
-      data = at24c02_read_one_byte(100);
+      data = norflash_read_byte(0x123457);
       lcd_show_string(15, 140, 200, 24, 24, "read:           ", BLUE);
       lcd_show_num(15+6*12, 140, data, 3, 24, BLUE);
     }
