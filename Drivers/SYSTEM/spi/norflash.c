@@ -8,7 +8,7 @@ void norflash_init() {
     //初始化NSS线
     __HAL_RCC_GPIOB_CLK_ENABLE();
     GPIO_InitTypeDef gpio_InitStruct;
-    gpio_InitStruct.Mode = GPIO_MODE_AF_PP;     //注意引脚都设为复用推挽输出
+    gpio_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;     //注意NSS线模式：OUTPUT_PP
     gpio_InitStruct.Pull = GPIO_PULLUP;
     gpio_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
     gpio_InitStruct.Pin = GPIO_PIN_12;      //NSS
