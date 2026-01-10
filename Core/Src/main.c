@@ -35,6 +35,7 @@
 #include "../../Drivers/SYSTEM/dac/dac.h"
 #include "../../Drivers/SYSTEM/iic/iic.h"
 #include "../../Drivers/SYSTEM/spi/norflash.h"
+#include "../../Drivers/SYSTEM/can/can.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -118,20 +119,33 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t key;
-  uint8_t data;
-  norflash_init();
+  uint8_t randx = 0;  //随机数
+  uint8_t dlc = 0;    //接收的数据长度
+  uint8_t send_buf[8];
+  uint8_t rec_buf[8];
+  can_init();
   lcd_show_string(15, 110, 200, 24, 24, "Init success...", BLUE);
   while (1) {
     key = key_scan(0);
     if (key == KEY1_PRES) {
-      norflash_write_page(0x123457,37);    //在地址100处 写入数据37
+      for (int i = 0; i < 8; i++) {   //随便初始化一下发送数组
+        send_buf[i] = 77 + randx;
+      }
+      can_send_message(0x12345678, send_buf, 8);    //发送长度8的uint8数组、共64位，用一个数据帧发送
       lcd_show_string(15, 140, 200, 24, 24, "write success...", BLUE);
-    } else if (key == KEY0_PRES) {
-      data = norflash_read_byte(0x123457);
-      lcd_show_string(15, 140, 200, 24, 24, "read:           ", BLUE);
-      lcd_show_num(15+6*12, 140, data, 3, 24, BLUE);
     }
+    //只要接收到就显示
+    dlc = can_receive_message(rec_buf);   //接收
+    if (dlc) {
+      lcd_show_string(15, 170, 200, 24, 24, "read:           ", BLUE);
+      for (int i = 0; i < dlc; i++) {
+        lcd_show_num(15+6*12, 170+i*14, rec_buf[i], 3, 12, BLUE);
+      }
+    }
+
+    randx++;
     delay_ms(100);
+
     /* USER CODE BEGIN 3 */
 
   }
