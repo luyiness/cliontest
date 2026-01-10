@@ -56,6 +56,9 @@ void TIM8_CC_IRQHandler(void) {     //TIM8，CC中断函数
     HAL_TIM_IRQHandler(&g_atimx_pwm_survey_handle);
 }
 
+uint16_t g_timxchy_pwmin_sta;    /* PWM输入状态 */
+uint32_t g_timxchy_pwmin_hval;   /* PWM的高电平脉宽, CCR2 */
+uint32_t g_timxchy_pwmin_cval;
 
 /* PWM输入模式 重新启动捕获 */
 void atim_timx_pwmin_chy_restart(void) {

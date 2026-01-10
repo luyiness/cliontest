@@ -18,9 +18,9 @@ void EXTI0_IRQHandler(void) {
     HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_0);
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    if (GPIO_Pin == GPIO_PIN_0)
-    {
-        /* HAL_GPIO_EXTI_IRQHandler()函数已经为我们清除了中断标志位，所以我们进了回调函数可以不做任何事 */
-    }
-}
+// void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+//     if (GPIO_Pin == GPIO_PIN_0)
+//     {
+//         /* HAL_GPIO_EXTI_IRQHandler()函数已经为我们清除了中断标志位，所以我们进了回调函数可以不做任何事 */
+//     }
+// }
